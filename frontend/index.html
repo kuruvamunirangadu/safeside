@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safety Console</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <main class="layout">
+        <section class="status-panel">
+            <h1>Humanoid Safety Console</h1>
+            <div id="stateMachine" class="state-machine"></div>
+            <div class="status-grid">
+                <div>
+                    <span class="label">Mode</span>
+                    <span id="mode" class="value mode-badge">-</span>
+                </div>
+                <div>
+                    <span class="label">Battery</span>
+                    <span id="battery" class="value">-</span>
+                </div>
+                <div>
+                    <span class="label">Position</span>
+                    <span id="position" class="value">-</span>
+                </div>
+                <div>
+                    <span class="label">Velocity</span>
+                    <span id="velocity" class="value">-</span>
+                </div>
+                <div>
+                    <span class="label">Risk Score</span>
+                    <span id="risk-score" class="value">0.00</span>
+                </div>
+                <div>
+                    <span class="label">Risk Level</span>
+                    <span id="risk-level" class="value risk-badge" data-level="low">LOW</span>
+                </div>
+                <div>
+                    <span class="label">Trust Level</span>
+                    <span id="trust-level" class="value trust-badge" data-level="medium">MEDIUM</span>
+                </div>
+                <div>
+                    <span class="label">Trust Score</span>
+                    <span id="trust-score" class="value">0.50</span>
+                </div>
+                <div>
+                    <span class="label">Human Feeling</span>
+                    <span id="human-feeling" class="value">-</span>
+                </div>
+                <div>
+                    <span class="label">Stress Score</span>
+                    <span id="human-stress" class="value">0.0</span>
+                </div>
+                <div class="human-detail">
+                    <span class="label">Human Reason</span>
+                    <span id="human-reason" class="value-detail">-</span>
+                </div>
+                <div class="human-detail">
+                    <span class="label">Feeling Updated</span>
+                    <span id="human-updated" class="value-detail">-</span>
+                </div>
+                <div class="human-detail">
+                    <span class="label">Risk Reason</span>
+                    <span id="risk-reason" class="value-detail">-</span>
+                </div>
+                <div class="human-detail">
+                    <span class="label">Risk Updated</span>
+                    <span id="risk-updated" class="value-detail">-</span>
+                </div>
+                <div class="human-detail">
+                    <span class="label">Hazard Margin</span>
+                    <span id="risk-distance" class="value-detail">-</span>
+                </div>
+                <div class="human-detail">
+                    <span class="label">Trust Notes</span>
+                    <span id="trust-reason" class="value-detail">-</span>
+                </div>
+                <div class="human-detail">
+                    <span class="label">Trust Updated</span>
+                    <span id="trust-updated" class="value-detail">-</span>
+                </div>
+                <div class="human-detail">
+                    <span class="label">Human Interventions</span>
+                    <span id="trust-human-count" class="value-detail">0</span>
+                </div>
+                <div class="human-detail">
+                    <span class="label">AI Interventions</span>
+                    <span id="trust-ai-count" class="value-detail">0</span>
+                </div>
+                <div>
+                    <span class="label">Adapter Status</span>
+                    <span id="adapter-attached" class="value adapter-badge" data-status="disconnected">-</span>
+                </div>
+                <div>
+                    <span class="label">Adapter Name</span>
+                    <span id="adapter-name" class="value">-</span>
+                </div>
+                <div>
+                    <span class="label">Adapter Echo Mode</span>
+                    <span id="adapter-mode" class="value">-</span>
+                </div>
+                <div class="human-detail">
+                    <span class="label">Adapter Members</span>
+                    <span id="adapter-members" class="value-detail">-</span>
+                </div>
+                <div class="human-detail">
+                    <span class="label">Adapter Updated</span>
+                    <span id="adapter-updated" class="value-detail">-</span>
+                </div>
+                <div class="human-detail">
+                    <span class="label">Adapter Alert</span>
+                    <span id="adapter-error" class="value-detail adapter-error" data-has-error="false">-</span>
+                </div>
+            </div>
+        </section>
+
+        <div id="risk-banner" class="risk-banner" data-level="low">Predictive risk nominal</div>
+
+        <section class="control-panel">
+            <h2>Controls</h2>
+            <section class="experiment-panel">
+                <h3>Risk Experiment</h3>
+                <div class="experiment-grid">
+                    <label for="exp-score">Risk Score</label>
+                    <input id="exp-score" type="number" min="0" max="1" step="0.05" value="0.8">
+                    <label for="exp-duration">Duration (s)</label>
+                    <input id="exp-duration" type="number" min="0.5" step="0.5" value="5">
+                    <label for="exp-reason">Reason</label>
+                    <input id="exp-reason" type="text" placeholder="High risk test">
+                    <label for="exp-details">Details (JSON)</label>
+                    <textarea id="exp-details" rows="2" placeholder='{"region": "zone-3"}'></textarea>
+                </div>
+                <div class="experiment-actions">
+                    <button id="exp-inject" type="button" class="accent">Inject Risk Override</button>
+                    <button id="exp-clear" type="button" class="secondary">Clear Override</button>
+                    <span id="exp-status" class="experiment-status">No override</span>
+                </div>
+            </section>
+            <div class="feeling-form">
+                <label for="feeling-select">Human Feeling</label>
+                <select id="feeling-select">
+                    <option value="SAFE">SAFE</option>
+                    <option value="UNSURE">UNSURE</option>
+                    <option value="DANGEROUS">DANGEROUS</option>
+                </select>
+                <label for="feeling-reason">Reason / Notes</label>
+                <textarea id="feeling-reason" rows="2" placeholder="e.g., Robot near edge"></textarea>
+                <button id="feeling-submit" type="button" class="secondary">Update Feeling Only</button>
+            </div>
+            <div class="controls">
+                <button data-action="start">Start</button>
+                <button data-action="resume">Resume</button>
+                <button data-action="pause">Pause</button>
+                <button data-action="caution">Caution</button>
+                <button data-action="caution_off">Caution Off</button>
+                <button data-action="emergency_stop" class="danger">Emergency Stop</button>
+                <button id="voice-btn">🎙️ Voice STOP</button>
+                <button data-action="reset" class="secondary">Reset</button>
+            </div>
+            <p id="command-message" class="command-message">&nbsp;</p>
+        </section>
+
+        <section class="event-panel log-panel">
+            <h2>Event History</h2>
+            <ul id="event-list" class="event-list"></ul>
+        </section>
+
+        <section class="adapter-trace-panel log-panel">
+            <h2>Adapter Trace</h2>
+            <div class="adapter-trace-meta">
+                <span class="label">Twin Log Path</span>
+                <span id="adapter-trace-path" class="value-detail">-</span>
+            </div>
+            <ul id="adapter-trace-list" class="event-list"></ul>
+        </section>
+
+        <section class="simulation-panel log-panel">
+            <h2>Workflow Simulation</h2>
+            <canvas id="sim-canvas" class="canvas-visual" width="420" height="420" aria-label="Robot workspace visualization"></canvas>
+            <p class="sim-note">Simplified humanoid figure shows current pose; hazard boundary ring and trail illustrate workflow context.</p>
+        </section>
+
+        <section class="perception-panel log-panel">
+            <h2>Operator Perception</h2>
+            <canvas id="perception-canvas" class="canvas-visual" width="420" height="320" aria-label="Operator perception visualization"></canvas>
+            <p class="sim-note">Second figure mirrors operator feedback; colors and motion reflect feeling and stress levels.</p>
+        </section>
+
+        <section class="analytics-panel log-panel">
+            <h2>Risk Analytics</h2>
+            <div class="chart-group">
+                <canvas id="riskChart" width="600" height="200" aria-label="Risk score trend"></canvas>
+                <canvas id="modeChart" width="600" height="120" aria-label="Mode timeline"></canvas>
+            </div>
+            <div id="analytics-fallback" class="analytics-fallback hidden" role="status" aria-live="polite">
+                <p class="fallback-message">Charts unavailable. Displaying rolling summary.</p>
+                <div class="fallback-metrics">
+                    <div>
+                        <span class="metric-label">Latest risk</span>
+                        <span id="fallback-risk-latest" class="metric-value">-</span>
+                    </div>
+                    <div>
+                        <span class="metric-label">Average (last 20)</span>
+                        <span id="fallback-risk-average" class="metric-value">-</span>
+                    </div>
+                    <div>
+                        <span class="metric-label">Max</span>
+                        <span id="fallback-risk-max" class="metric-value">-</span>
+                    </div>
+                    <div>
+                        <span class="metric-label">Common modes</span>
+                        <span id="fallback-mode-common" class="metric-value">-</span>
+                    </div>
+                </div>
+                <div id="fallback-risk-bars" class="fallback-bars" aria-hidden="true"></div>
+                <p class="fallback-note">Install Chart.js locally or unblock the CDN to restore full analytics visualizations.</p>
+            </div>
+        </section>
+
+        <section class="playback-panel log-panel">
+            <h2>Scenario Playback</h2>
+            <div class="playback section-row">
+                <div class="recording-controls">
+                    <label for="record-name" class="sr-label">Session name</label>
+                    <input id="record-name" type="text" placeholder="session name (optional)">
+                    <button id="record-start" type="button" class="accent">Start Recording</button>
+                    <button id="record-stop" type="button" class="secondary">Stop Recording</button>
+                </div>
+                <div class="session-controls">
+                    <label for="session-select">Sessions</label>
+                    <div class="session-row">
+                        <select id="session-select">
+                            <option value="">Loading…</option>
+                        </select>
+                        <button id="session-refresh" type="button" class="secondary">Refresh</button>
+                    </div>
+                </div>
+                <div class="playback-controls">
+                    <button id="playback-play" type="button" class="accent">Play</button>
+                    <button id="playback-pause" type="button" class="secondary">Pause</button>
+                    <button id="playback-exit" type="button" class="secondary">Resume Live</button>
+                    <label for="playback-speed">Speed</label>
+                    <input id="playback-speed" type="range" min="0.25" max="3" step="0.25" value="1">
+                    <span id="playback-speed-label">1.0x</span>
+                </div>
+            </div>
+            <p id="playback-status" class="playback-status">Playback idle</p>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
